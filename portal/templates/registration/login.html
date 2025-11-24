@@ -1,0 +1,52 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-5 col-lg-4">
+        <div class="card p-4 shadow-lg border-0">
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <i class="bi bi-mortarboard-fill text-primary fs-1"></i>
+                    <h3 class="fw-bold mt-2">Welcome Back</h3>
+                    <p class="text-muted">Sign in to access your alumni network</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger small py-2 rounded-3 mb-3">
+                            <i class="bi bi-exclamation-circle me-1"></i> Invalid credentials
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Username</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Password</label>
+                        {{ form.password }}
+                    </div>
+                    
+                    <div class="text-end mb-3">
+                        <a href="{% url 'password_reset' %}" class="small text-decoration-none text-primary">Forgot Password?</a>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary py-2 rounded-pill shadow-sm">Sign In</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-white border-0 text-center py-3">
+                <small class="text-muted">New here? <a href="{% url 'register' %}" class="text-primary text-decoration-none fw-bold">Create Account</a></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto-style inputs -->
+<script>
+    document.querySelectorAll('input').forEach(input => input.classList.add('form-control'));
+</script>
+{% endblock %}

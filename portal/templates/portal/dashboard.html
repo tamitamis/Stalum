@@ -1,0 +1,191 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Sidebar: Profile Summary -->
+    <div class="col-lg-3 d-none d-lg-block">
+        <div class="card text-center p-3">
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-fill fs-1 text-secondary"></i>
+                    </div>
+                </div>
+                <h5 class="card-title mb-1">{{ user.first_name }} {{ user.last_name }}</h5>
+                <p class="text-muted small mb-3">@{{ user.username }}</p>
+                
+                {% if user.is_alumni %}
+                    <span class="badge badge-alumni rounded-pill mb-2 px-3 py-2">Alumni</span>
+                {% else %}
+                    <span class="badge badge-student rounded-pill mb-2 px-3 py-2">Student</span>
+                {% endif %}
+                
+                <div class="small text-muted mb-3">
+                    <span class="fw-bold text-dark">{{ user.following.count }}</span> Following
+                </div>
+
+                <hr class="my-3">
+                
+                <div class="d-grid gap-2 text-start">
+                    <a href="{% url 'profile' user.username %}" class="btn btn-light btn-sm text-start">
+                        <i class="bi bi-person me-2"></i> View Profile
+                    </a>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-light btn-sm text-start">
+                        <i class="bi bi-pencil me-2"></i> Edit Details
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Center: Newsfeed -->
+    <div class="col-lg-6">
+        <!-- Post Creation -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Share an update</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="post_submit" value="1">
+                    <div class="mb-3">
+                        {{ form.content }}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-muted small">
+                            <i class="bi bi-image me-2"></i>
+                            <i class="bi bi-paperclip me-2"></i>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill">Post</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Posts Feed -->
+        {% for post in posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <!-- Post Header -->
+                    <div class="d-flex mb-3">
+                        <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                            <span class="fw-bold text-secondary">{{ post.author.first_name|first }}{{ post.author.last_name|first }}</span>
+                        </div>
+                        <div>
+                            <a href="{% url 'profile' post.author.username %}" class="text-decoration-none text-dark fw-bold">
+                                {{ post.author.first_name }} {{ post.author.last_name }}
+                            </a>
+                            <div class="text-muted small" style="font-size: 0.8rem;">
+                                {% if post.author.is_alumni %}Alumni{% else %}Student{% endif %} &bull; {{ post.created_at|timesince }} ago
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="card-text">{{ post.content|linebreaks }}</p>
+                    <hr class="text-muted opacity-25">
+                    
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between mb-3">
+                        <!-- Like Button (Functional) -->
+                        <a href="{% url 'like_post' post.id %}" class="btn btn-sm w-100 me-1 {% if request.user in post.likes.all %}btn-primary text-white{% else %}btn-light text-muted{% endif %}">
+                            <i class="bi {% if request.user in post.likes.all %}bi-hand-thumbs-up-fill{% else %}bi-hand-thumbs-up{% endif %} me-1"></i> 
+                            Like ({{ post.likes.count }})
+                        </a>
+                        
+                        <button class="btn btn-sm btn-light text-muted w-100 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#comments-{{ post.id }}">
+                            <i class="bi bi-chat me-1"></i> Comment ({{ post.comments.count }})
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="collapse" id="comments-{{ post.id }}">
+                        <div class="bg-light p-3 rounded-3">
+                            <form action="{% url 'add_comment' post.id %}" method="post" class="mb-3 d-flex gap-2">
+                                {% csrf_token %}
+                                {{ comment_form.content }}
+                                <button type="submit" class="btn btn-primary btn-sm rounded-circle"><i class="bi bi-send-fill"></i></button>
+                            </form>
+
+                            {% for comment in post.comments.all %}
+                                {% if not comment.parent %}
+                                    <div class="mb-3">
+                                        <div class="d-flex">
+                                            <div class="flex-grow-1">
+                                                <div class="bg-white p-2 rounded-3 shadow-sm">
+                                                    <strong class="small">{{ comment.author.first_name }} {{ comment.author.last_name }}</strong>
+                                                    <span class="text-muted small ms-2" style="font-size:0.75rem">{{ comment.created_at|timesince }} ago</span>
+                                                    <p class="mb-0 small">{{ comment.content }}</p>
+                                                </div>
+                                                
+                                                <div class="ms-2 mt-1">
+                                                    <a href="#" class="text-decoration-none small text-muted fw-bold" data-bs-toggle="collapse" data-bs-target="#reply-form-{{ comment.id }}">Reply</a>
+                                                </div>
+
+                                                {% for reply in comment.replies.all %}
+                                                    <div class="d-flex mt-2 ms-4">
+                                                        <div class="bg-white p-2 rounded-3 shadow-sm w-100">
+                                                            <strong class="small">{{ reply.author.first_name }}</strong>
+                                                            <p class="mb-0 small">{{ reply.content }}</p>
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+
+                                                <div class="collapse mt-2 ms-4" id="reply-form-{{ comment.id }}">
+                                                    <form action="{% url 'add_comment' post.id %}" method="post" class="d-flex gap-2">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                                        {{ comment_form.content }}
+                                                        <button type="submit" class="btn btn-secondary btn-sm rounded-circle"><i class="bi bi-reply-fill"></i></button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-newspaper fs-1 mb-3 d-block"></i>
+                <p>No updates yet. Be the first to post!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Right Sidebar: Suggested Connections (Functional) -->
+    <div class="col-lg-3 d-none d-lg-block">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3">Suggested Connections</h6>
+                {% for suggestion in suggested_users %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-info bg-opacity-10 text-info p-2 me-2" style="width:35px;height:35px;display:flex;align-items:center;justify-content:center;">
+                            {{ suggestion.first_name|first }}{{ suggestion.last_name|first }}
+                        </div>
+                        <div class="flex-grow-1 line-height-sm overflow-hidden">
+                            <small class="d-block fw-bold text-truncate">{{ suggestion.first_name }} {{ suggestion.last_name }}</small>
+                            <small class="text-muted" style="font-size: 0.7rem;">
+                                {% if suggestion.is_alumni %}Alumni{% else %}Student{% endif %}
+                            </small>
+                        </div>
+                        <a href="{% url 'follow_user' suggestion.id %}" class="btn btn-sm btn-outline-primary py-0 rounded-pill"><i class="bi bi-plus"></i></a>
+                    </div>
+                {% empty %}
+                    <p class="small text-muted">No new suggestions available.</p>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-body">
+                <ul class="list-unstyled mb-0 d-grid gap-2">
+                    <li><a href="{% url 'events' %}" class="text-decoration-none text-dark d-flex align-items-center"><i class="bi bi-calendar-event me-2 text-success"></i> Upcoming Events</a></li>
+                    <li><a href="{% url 'directory' %}" class="text-decoration-none text-dark d-flex align-items-center"><i class="bi bi-search me-2 text-info"></i> Find Peers</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

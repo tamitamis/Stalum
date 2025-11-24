@@ -1,0 +1,50 @@
+{% extends 'portal/base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Alumni & Student Directory</h2>
+
+<!-- Search Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="q" class="form-control" placeholder="Search name..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="industry" class="form-control" placeholder="Industry" value="{{ request.GET.industry }}">
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="year" class="form-control" placeholder="Graduation Year" value="{{ request.GET.year }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Grid -->
+<div class="row">
+    {% for u in users %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5>{{ u.first_name }} {{ u.last_name }}</h5>
+                    <p class="text-muted mb-1">
+                        {% if u.is_alumni %} <span class="badge bg-success">Alumni</span> {% endif %}
+                        {% if u.is_student %} <span class="badge bg-info text-dark">Student</span> {% endif %}
+                    </p>
+                    
+                    {% if u.profile.industry %}
+                        <p class="card-text small text-muted mb-1">{{ u.profile.industry }}</p>
+                    {% endif %}
+                    
+                    <a href="{% url 'profile' u.username %}" class="btn btn-sm btn-outline-primary mt-2">View Profile</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-center text-muted">No users found matching your criteria.</p>
+    {% endfor %}
+</div>
+{% endblock %}
