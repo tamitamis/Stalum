@@ -1,0 +1,44 @@
+Version Control
+
+.git
+.gitignore
+
+Python
+
+pycache
+*.pyc
+*.pyo
+*.pyd
+
+Virtual Environment (CRITICAL: Never copy this into Docker)
+
+venv
+env
+.venv
+
+Environment Variables (CRITICAL: Never bake secrets into image)
+
+.env
+
+Local Database (Don't overwrite production DB with local test data)
+
+db.sqlite3
+db.sqlite3-journal
+
+Static & Media (These are generated/handled separately)
+
+staticfiles
+media
+
+IDE Settings
+
+.vscode
+.idea
+
+CI/CD Configs (Not needed inside the app container)
+
+Jenkinsfile
+sonar-project.properties
+Dockerfile
+.dockerignore
+README.md
