@@ -2,23 +2,23 @@ pipeline {
     agent any
 
     environment {
-        // --- CONFIGURATION ---
-        // Nexus Configuration
-        NEXUS_URL = 'nexus.imcc.com'
-        NEXUS_PROTOCOL = 'http://'
-        NEXUS_REPO = 'alumni-docker-repo'  // CHECK THIS: Ask if there is a specific repo name
+        // --- YOUR COLLEGE CONFIGURATION ---
+        
+        // Nexus Settings
+        NEXUS_URL = 'nexus.imcc.com' 
+        // NOTE: If Docker push fails, try adding port :8082 or :8083 to this URL
+        NEXUS_REPO = '2401192' 
         IMAGE_NAME = 'alumni-portal'
         
-        // Nexus Credentials
+        // Nexus Credentials (student / Imcc@2025)
         NEXUS_USER = 'student'
         NEXUS_PASS = 'Imcc@2025'
 
-        // SonarQube Tool Name (Must match what is configured in Jenkins Global Tools)
-        SONAR_SCANNER_TOOL = 'SonarScanner' 
+        // SonarQube Settings are read from sonar-project.properties automatically
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
                 checkout scm
             }
@@ -26,17 +26,10 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
+                // This uses the SonarScanner tool installed on the college server
                 script {
-                    // We use the tool configured in Jenkins
-                    def scannerHome = tool "${SONAR_SCANNER_TOOL}"
-                    
-                    // We pass the login details explicitly in case Jenkins isn't pre-configured
-                    sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.host.url=http://sonarqube.imcc.com/ \
-                        -Dsonar.login=student \
-                        -Dsonar.password=Imccstudent@2025
-                    """
+                    def scannerHome = tool 'SonarScanner' 
+                    sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
@@ -44,9 +37,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the image tagged with the Nexus URL
-                    // Note: We use the URL without http:// for the tag
-                    sh "docker build -t ${NEXUS_URL}/${NEXUS_REPO}/${IMAGE_NAME}:${BUILD_NUMBER} ."
+                    // Build the image locally on Jenkins
+                    sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
                 }
             }
         }
@@ -55,18 +47,16 @@ pipeline {
             steps {
                 script {
                     // 1. Log in to Nexus
-                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} ${NEXUS_PROTOCOL}${NEXUS_URL}"
+                    // We wrap the URL in http:// because your college uses http
+                    sh "docker login -u ${NEXUS_USER} -p ${NEXUS_PASS} http://${NEXUS_URL}"
                     
-                    // 2. Push the image
+                    // 2. Tag the image for Nexus
+                    sh "docker tag ${IMAGE_NAME}:${BUILD_NUMBER} ${NEXUS_URL}/${NEXUS_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}"
+                    
+                    // 3. Push the image
                     sh "docker push ${NEXUS_URL}/${NEXUS_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}"
                 }
             }
-        }
-    }
-    
-    post {
-        always {
-            cleanWs()
         }
     }
 }
