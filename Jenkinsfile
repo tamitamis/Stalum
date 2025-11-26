@@ -12,6 +12,10 @@ pipeline {
         // Nexus Credentials
         NEXUS_USER = 'student'
         NEXUS_PASS = 'Imcc@2025'
+        
+        // SonarQube Token (Generate on sonarqube.imcc.com -> My Account -> Security)
+        // CRITICAL: Replace the text inside quotes with your actual token (sqp_...)
+        SONAR_TOKEN = 'squ_4bb9a27b54c82377276324092165aa2053f702da'
 
         // --- FIX FOR CRASHING AGENT ---
         // Limit SonarScanner to 256MB RAM so it doesn't kill the container
@@ -29,7 +33,8 @@ pipeline {
             steps {
                 script {
                     def scannerHome = tool 'SonarScanner' 
-                    sh "${scannerHome}/bin/sonar-scanner"
+                    // We pass the token here so Jenkins can log in
+                    sh "${scannerHome}/bin/sonar-scanner -Dsonar.token=${SONAR_TOKEN}"
                 }
             }
         }
