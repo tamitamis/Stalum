@@ -1,5 +1,6 @@
 # Use Python 3.11
-FROM python:3.11-slim
+ARG REGISTRY=docker.io/library
+FROM ${REGISTRY}/python:3.11-slim
 
 # Prevent Python from writing temporary files
 ENV PYTHONDONTWRITEBYTECODE=1

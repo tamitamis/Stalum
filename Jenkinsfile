@@ -72,14 +72,34 @@ spec:
             }
         }
 
+        stage('Login to Docker Registry') {
+            steps {
+                container('dind') {
+                    sh 'docker --version'
+                    // Check for docker daemon readiness
+                    sh '''
+                        timeout=60
+                        while ! docker info > /dev/null 2>&1; do
+                            if [ $timeout -le 0 ]; then
+                                echo "Timed out waiting for Docker daemon"
+                                exit 1
+                            fi
+                            echo "Waiting for docker daemon..."
+                            sleep 1
+                            timeout=$((timeout - 1))
+                        done
+                    '''
+                    // Using the registry IP/Port directly as requested
+                    sh "docker login http://${IMAGE_REGISTRY} -u student -p Imcc@2025"
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 container('dind') {
-                    sh '''
-                        sleep 15
-                        docker build -t alumni-portal:latest .
-                        docker image ls
-                    '''
+                    sh "docker build --build-arg REGISTRY=${IMAGE_REGISTRY} -t alumni-portal:latest ."
+                    sh "docker image ls"
                 }
             }
         }
@@ -101,16 +121,7 @@ spec:
             }
         }
 
-        stage('Login to Docker Registry') {
-            steps {
-                container('dind') {
-                    sh 'docker --version'
-                    sh 'sleep 10'
-                    // Using the registry IP/Port directly as requested
-                    sh "docker login http://${IMAGE_REGISTRY} -u student -p Imcc@2025"
-                }
-            }
-        }
+        // Login stage moved to run before build
 
         stage('Build - Tag - Push') {
             steps {
