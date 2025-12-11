@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        // --- YOUR COLLEGE CONFIGURATION ---
+        // --- CONFIGURATION ---
         
         // Nexus Settings
         NEXUS_URL = 'nexus.imcc.com' 
@@ -14,10 +14,9 @@ pipeline {
         NEXUS_PASS = 'Imcc@2025'
         
         // SonarQube Token (Generate on sonarqube.imcc.com -> My Account -> Security)
-        // CRITICAL: Replace the text inside quotes with your actual token (sqp_...)
         SONAR_TOKEN = 'squ_4bb9a27b54c82377276324092165aa2053f702da'
 
-        // --- FIX FOR CRASHING AGENT ---
+       
         // Limit SonarScanner to 256MB RAM so it doesn't kill the container
         SONAR_SCANNER_OPTS = '-Xmx256m'
     }
