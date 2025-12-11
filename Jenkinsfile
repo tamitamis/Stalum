@@ -4,9 +4,6 @@ pipeline {
             yaml '''
 apiVersion: v1
 kind: Pod
-metadata:
-  labels:
-    app: alumni-portal-builder
 spec:
   containers:
   - name: python
@@ -19,11 +16,6 @@ spec:
     command:
     - cat
     tty: true
-    resources:
-      limits:
-        memory: "512Mi"
-      requests:
-        memory: "128Mi"
   - name: kubectl
     image: bitnami/kubectl:latest
     command:
@@ -31,6 +23,13 @@ spec:
     tty: true
     securityContext:
       runAsUser: 0
+    env:
+    - name: KUBECONFIG
+      value: /kube/config
+    volumeMounts:
+    - name: kubeconfig-secret
+      mountPath: /kube/config
+      subPath: kubeconfig
   - name: dind
     image: docker:dind
     securityContext:
@@ -38,16 +37,26 @@ spec:
     env:
     - name: DOCKER_TLS_CERTDIR
       value: ""
+    volumeMounts:
+    - name: docker-config
+      mountPath: /etc/docker/daemon.json
+      subPath: daemon.json
+  volumes:
+  - name: docker-config
+    configMap:
+      name: docker-daemon-config
+  - name: kubeconfig-secret
+    secret:
+      secretName: kubeconfig-secret
 '''
         }
     }
 
     environment {
-        // Your Specific Configs
-        NEXUS_URL = 'nexus.imcc.com'
-        NEXUS_REPO = 'my-repository' 
-        IMAGE_NAME = 'alumni-portal'
-        NAMESPACE = '2401192' // Using your ID as namespace
+        // Project Specific Configs
+        IMAGE_REGISTRY = '127.0.0.1:30085'
+        IMAGE_PATH = '2401192-project/alumni-portal'
+        NAMESPACE = '2401192'
     }
 
     stages {
@@ -56,7 +65,6 @@ spec:
                 container('python') {
                     sh '''
                         pip install -r requirements.txt
-                        pip install gunicorn whitenoise
                         python manage.py test
                     '''
                 }
@@ -67,9 +75,8 @@ spec:
             steps {
                 container('dind') {
                     sh '''
-                        # Wait for docker daemon to be ready
-                        sleep 5
-                        docker build -t ${IMAGE_NAME}:latest .
+                        sleep 15
+                        docker build -t alumni-portal:latest .
                         docker image ls
                     '''
                 }
@@ -79,11 +86,10 @@ spec:
         stage('SonarQube Analysis') {
             steps {
                 container('sonar-scanner') {
-                    // Using the credentials you provided
                     sh '''
                         sonar-scanner \
                             -Dsonar.projectKey=alumni_portal_project \
-                            -Dsonar.host.url=http://sonarqube.imcc.com/ \
+                            -Dsonar.host.url=http://my-sonarqube-sonarqube.sonarqube.svc.cluster.local:9000 \
                             -Dsonar.login=student \
                             -Dsonar.password=Imccstudent@2025 \
                             -Dsonar.sources=. \
@@ -94,36 +100,42 @@ spec:
             }
         }
 
-        stage('Login & Push to Nexus') {
+        stage('Login to Docker Registry') {
             steps {
                 container('dind') {
-                    script {
-                        // Login
-                        sh "docker login -u student -p Imcc@2025 http://${NEXUS_URL}"
-                        
-                        // Tag
-                        sh "docker tag ${IMAGE_NAME}:latest ${NEXUS_URL}/${NEXUS_REPO}/${IMAGE_NAME}:latest"
-                        
-                        // Push
-                        sh "docker push ${NEXUS_URL}/${NEXUS_REPO}/${IMAGE_NAME}:latest"
-                    }
+                    sh 'docker --version'
+                    sh 'sleep 10'
+                    // Using the registry IP/Port directly as requested
+                    sh "docker login ${IMAGE_REGISTRY} -u student -p Imcc@2025"
                 }
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Build - Tag - Push') {
+            steps {
+                container('dind') {
+                    sh "docker tag alumni-portal:latest ${IMAGE_REGISTRY}/${IMAGE_PATH}:latest"
+                    sh "docker push ${IMAGE_REGISTRY}/${IMAGE_PATH}:latest"
+                }
+            }
+        }
+
+        stage('Deploy Application') {
             steps {
                 container('kubectl') {
                     script {
-                        // Create the deployment YAML dynamically or read from file
-                        // Here we create the namespace and apply the file we will create next
-                        sh """
-                            kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
-                            kubectl apply -f k8s-deployment/alumni-deployment.yaml -n ${NAMESPACE}
-                            
-                            # Wait for rollout to finish
-                            kubectl rollout status deployment/alumni-portal -n ${NAMESPACE}
-                        """
+                        dir('k8s-deployment') {
+                            sh """
+                                # Create namespace if not exists
+                                kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
+                                
+                                # Apply deployment and ingress
+                                kubectl apply -f alumni-deployment.yaml -n ${NAMESPACE}
+
+                                # Wait for rollout
+                                kubectl rollout status deployment/alumni-portal -n ${NAMESPACE}
+                            """
+                        }
                     }
                 }
             }
