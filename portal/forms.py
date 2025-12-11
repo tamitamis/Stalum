@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Profile, Post, Job, Event, Comment
+from .models import User, Profile, Post, Job, Event, Comment, JobApplication
 from django.core.exceptions import ValidationError
 import datetime
 
