@@ -54,8 +54,9 @@ spec:
 
     environment {
         // Project Specific Configs
-        IMAGE_REGISTRY = '127.0.0.1:30085'
-        IMAGE_PATH = '2401192-project/alumni-portal'
+        // Project Specific Configs
+        IMAGE_REGISTRY = 'nexus.imcc.com'
+        IMAGE_PATH = 'my-repository/alumni-portal'
         NAMESPACE = '2401192'
     }
 
@@ -106,7 +107,7 @@ spec:
                     sh 'docker --version'
                     sh 'sleep 10'
                     // Using the registry IP/Port directly as requested
-                    sh "docker login ${IMAGE_REGISTRY} -u student -p Imcc@2025"
+                    sh "docker login http://${IMAGE_REGISTRY} -u student -p Imcc@2025"
                 }
             }
         }

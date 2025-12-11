@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: alumni-portal
-        image: 127.0.0.1:30085/2401192-project/alumni-portal:latest
+        image: nexus.imcc.com/my-repository/alumni-portal:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
