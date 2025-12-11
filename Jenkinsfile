@@ -6,7 +6,7 @@ pipeline {
         
         // Nexus Settings
         NEXUS_URL = 'nexus.imcc.com' 
-        NEXUS_REPO = '2401192' // Make sure this matches your repo name!
+        NEXUS_REPO = 'my-repository' // Make sure this matches your repo name!
         IMAGE_NAME = 'alumni-portal'
         
         // Nexus Credentials
