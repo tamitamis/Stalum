@@ -49,5 +49,6 @@ class PostModelTest(TestCase):
         )
         
         # Access applicants page
+        self.client.force_login(self.user)
         response = self.client.get(reverse('view_applicants', args=[job.id]))
         self.assertEqual(response.status_code, 200)
