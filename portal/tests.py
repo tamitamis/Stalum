@@ -36,3 +36,18 @@ class PostModelTest(TestCase):
         """Test post content"""
         self.assertEqual(self.post.content, "Test Post")
         self.assertEqual(self.post.author.username, "testuser")
+
+    def test_view_applicants(self):
+        """Test that the job poster can view applicants"""
+        # Create a job
+        job = Job.objects.create(
+            title="Test Job",
+            company_name="Test Co",
+            description="Desc",
+            requirements="Reqs",
+            posted_by=self.user
+        )
+        
+        # Access applicants page
+        response = self.client.get(reverse('view_applicants', args=[job.id]))
+        self.assertEqual(response.status_code, 200)

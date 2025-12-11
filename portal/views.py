@@ -213,6 +213,22 @@ def apply_job(request, job_id):
 
     return render(request, 'portal/apply_job.html', {'form': form, 'job': job})
 
+@login_required
+def view_applicants(request, job_id):
+    """
+    Allow the job poster to view applicants for a specific job.
+    """
+    job = get_object_or_404(Job, id=job_id)
+    
+    # Permission check: Only the poster or superuser can view applicants
+    if request.user != job.posted_by and not request.user.is_superuser:
+        messages.error(request, "You do not have permission to view applicants for this job.")
+        return redirect('jobs')
+    
+    applicants = JobApplication.objects.filter(job=job).select_related('applicant', 'applicant__profile')
+    
+    return render(request, 'portal/view_applicants.html', {'job': job, 'applicants': applicants})
+
 # --- Events Module ---
 
 @login_required
