@@ -6,7 +6,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: 2401192.imcc.com
+  - host: stalum.imcc.com
     http:
       paths:
       - path: /
