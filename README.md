@@ -1,7 +1,7 @@
-# Alumni Portal
+# Stalum
 
 ## Project Overview
-**Alumni Connect** is a comprehensive platform designed to bridge the gap between current students and alumni. It fosters key interactions through professional networking, job opportunities, and campus events.
+**Stalum** is a comprehensive platform designed to bridge the gap between current students and alumni. It fosters key interactions through professional networking, job opportunities, and campus events.
 
 ### Key Features
 *   **Networking Feed**: Share updates, photos, and achievements with the community.
