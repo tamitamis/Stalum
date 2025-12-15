@@ -25,6 +25,10 @@
 ### Port Information
 The application runs on Port **8000** by default.
 
+### Live Deployment
+The application is accessible at:
+*   **URL**: `http://stalum.imcc.com` (Requires Ingress Configuration)
+
 ### Health Check
 To verify the application is running, perform a health check by accessing the root URL:
 *   **URL**: `http://localhost:8000/`
