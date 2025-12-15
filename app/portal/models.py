@@ -27,6 +27,7 @@ class Profile(models.Model):
     major = models.CharField(max_length=100, blank=True)
     current_company = models.CharField(max_length=100, blank=True)
     linkedin_url = models.URLField(blank=True)
+    profile_photo = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"

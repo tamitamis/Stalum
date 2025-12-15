@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alumni-portal
+  labels:
+    app: alumni-portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alumni-portal
+  template:
+    metadata:
+      labels:
+        app: alumni-portal
+    spec:
+      containers:
+      - name: alumni-portal
+        image: nexus.imcc.com/my-repository/alumni-portal:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        # Secure settings for production
+        - name: DJANGO_SECRET_KEY
+          value: "EUXMk1n9OYzOHBtdoroGfi9QdMiwnoJiG44A-DpEzliywCkf88LDl7LX5KE_9EMDP-qc"
+        - name: DEBUG
+          value: "False"

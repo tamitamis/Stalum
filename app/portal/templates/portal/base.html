@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Connect</title>
+
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            /* Light Mode (Oceanic Professional) */
+            --primary-color: #0E7490;
+            /* Deep Ocean Teal */
+            --primary-hover: #155E75;
+            /* Darker Teal */
+            --bg-color: #ECFEFF;
+            /* Subtle Cyan Tint (Not Grey) */
+            --card-bg: #FFFFFF;
+            /* White */
+            --text-main: #164E63;
+            /* Dark Cyan Ink */
+            --text-muted: #4B5563;
+            /* Cool Grey */
+            --border-color: rgba(14, 116, 144, 0.15);
+            /* Teal-tinted border */
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode (Oceanic Night) */
+            --primary-color: #22D3EE;
+            /* Bright Cyan (Glows on dark) */
+            --primary-hover: #06B6D4;
+            --bg-color: #0F172A;
+            /* Deep Slate/Navy Background */
+            --card-bg: #1E293B;
+            /* Lighter Navy Card */
+            --text-main: #F1F5F9;
+            /* Bright Off-White */
+            --text-muted: #CBD5E1;
+            /* Light Blue-Grey (High Visibility) */
+            --border-color: rgba(34, 211, 238, 0.2);
+            /* Cyan tint */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding-top: 80px;
+            /* Space for fixed navbar */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Navigation */
+        /* Navigation */
+        .navbar {
+            background-color: var(--bg-color);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.3s;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-muted) !important;
+            margin: 0 5px;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color) !important;
+        }
+
+        .btn-nav-logout {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .btn-nav-logout:hover {
+            color: #ef4444;
+            /* Red for logout */
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 16px;
+            background: var(--card-bg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            margin-bottom: 1.5rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+            color: var(--text-main);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Badges */
+        .badge-student {
+            background-color: #E0F2FE;
+            color: #0284C7;
+        }
+
+        .badge-alumni {
+            background-color: #DCFCE7;
+            color: #166534;
+        }
+
+        /* Forms */
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #D1D5DB;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.1);
+        }
+
+        /* Dark Mode Bootstrap Overrides */
+        [data-theme="dark"] .text-muted,
+        [data-theme="dark"] .text-secondary,
+        [data-theme="dark"] .form-text,
+        [data-theme="dark"] small {
+            color: var(--text-muted) !important;
+        }
+
+        /* CRITICAL FIX: Override text-dark to be white in dark mode */
+        [data-theme="dark"] .text-dark,
+        [data-theme="dark"] a.text-dark {
+            color: var(--text-main) !important;
+        }
+
+        /* Ensure card titles are visible */
+        [data-theme="dark"] .card-title,
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] h4,
+        [data-theme="dark"] h5,
+        [data-theme="dark"] h6 {
+            color: var(--text-main);
+        }
+
+        [data-theme="dark"] .bi,
+        [data-theme="dark"] i {
+            color: var(--text-muted);
+            /* Default icon color */
+        }
+
+        [data-theme="dark"] a {
+            color: var(--primary-color);
+        }
+
+        [data-theme="dark"] a:hover {
+            color: var(--primary-hover);
+        }
+
+        /* Fix for icons inside buttons or specific active states */
+        [data-theme="dark"] .btn-primary i {
+            color: white;
+        }
+
+        /* Ensure btn-light has visible text if used */
+        [data-theme="dark"] .btn-light {
+            background-color: #334155;
+            /* Dark Slate for buttons */
+            color: var(--text-main);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Map background utilities to Dark Mode equivalents */
+        [data-theme="dark"] .bg-light {
+            background-color: var(--card-bg) !important;
+            /* Lighter Navy */
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: #1E293B !important;
+            /* Match card bg */
+        }
+
+        /* Fix text-dark inside badges to remain dark if badge is light? 
+           Actually badges usually have their own colors. 
+           But .badge-student is hardcoded in base.html 
+        */
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'dashboard' %}">
+                <i class="bi bi-mortarboard-fill me-2"></i>AlumniConnect
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ms-lg-4">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}"><i
+                                class="bi bi-house-door me-1"></i> Feed</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'directory' %}"><i
+                                class="bi bi-people me-1"></i> Directory</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'jobs' %}"><i
+                                class="bi bi-briefcase me-1"></i> Jobs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'events' %}"><i
+                                class="bi bi-calendar-event me-1"></i> Events</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav align-items-center">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item me-2">
+                        <button class="btn btn-sm btn-light rounded-pill px-3" id="theme-toggle"
+                            title="Toggle Dark Mode">
+                            <i class="bi bi-moon-stars-fill"></i>
+                        </button>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="btn btn-sm btn-light rounded-pill px-3" href="{% url 'profile' user.username %}">
+                            <i class="bi bi-person-circle me-1"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-nav-logout bg-transparent border-0">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </form>
+                    </li>
+                    {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-primary ms-2" href="{% url 'register' %}">Get Started</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const toggleBtn = document.getElementById('theme-toggle');
+        const root = document.documentElement;
+
+        // 1. Check LocalStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+            if (toggleBtn) toggleBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
+        }
+
+        // 2. Toggle Logic
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => {
+                const currentTheme = root.getAttribute('data-theme');
+                if (currentTheme === 'dark') {
+                    root.setAttribute('data-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    toggleBtn.innerHTML = '<i class="bi bi-moon-stars-fill"></i>';
+                } else {
+                    root.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    toggleBtn.innerHTML = '<i class="bi bi-sun-fill"></i>';
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

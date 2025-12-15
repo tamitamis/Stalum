@@ -66,6 +66,7 @@ spec:
                 container('python') {
                     sh '''
                         pip install -r requirements.txt
+                        cd app
                         python manage.py test
                     '''
                 }
@@ -136,13 +137,13 @@ spec:
             steps {
                 container('kubectl') {
                     script {
-                        dir('k8s-deployment') {
+                        dir('k8s') {
                             sh """
                                 # Create namespace if not exists
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                                 
-                                # Apply deployment and ingress
-                                kubectl apply -f alumni-deployment.yaml -n ${NAMESPACE}
+                                # Apply deployment, service, ingress
+                                kubectl apply -f . -n ${NAMESPACE}
 
                                 # Wait for rollout
                                 kubectl rollout status deployment/alumni-portal -n ${NAMESPACE}

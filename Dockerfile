@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install gunicorn whitenoise
 
 # Copy project files
-COPY . /app/
+COPY app/ /app/
 
 # Collect static files (CSS)
 RUN python manage.py collectstatic --noinput

@@ -6,8 +6,20 @@
         <div class="card">
             <div class="card-body text-center">
                 <h2 class="card-title">{{ profile_user.first_name }} {{ profile_user.last_name }}</h2>
+
+                {% if profile_user.profile.profile_photo %}
+                <img src="{{ profile_user.profile.profile_photo.url }}" alt="Profile Photo" class="rounded-circle mb-3"
+                    style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <!-- Placeholder if no photo -->
+                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3"
+                    style="width: 150px; height: 150px; color: white; fs-1">
+                    {{ profile_user.first_name|first }}{{ profile_user.last_name|first }}
+                </div>
+                {% endif %}
+
                 <p class="text-muted">@{{ profile_user.username }}</p>
-                
+
                 <div class="mb-3">
                     {% if profile_user.is_alumni %} <span class="badge bg-success">Alumni</span> {% endif %}
                     {% if profile_user.is_student %} <span class="badge bg-info text-dark">Student</span> {% endif %}
@@ -25,7 +37,8 @@
                         <strong>Graduation Year:</strong> {{ profile_user.profile.graduation_year|default:"-" }}<br>
                         <strong>Major:</strong> {{ profile_user.profile.major|default:"-" }}<br>
                         {% if profile_user.profile.linkedin_url %}
-                            <strong>LinkedIn:</strong> <a href="{{ profile_user.profile.linkedin_url }}" target="_blank">View Profile</a>
+                        <strong>LinkedIn:</strong> <a href="{{ profile_user.profile.linkedin_url }}"
+                            target="_blank">View Profile</a>
                         {% endif %}
                     </div>
                 </div>
@@ -36,7 +49,7 @@
                 </div>
 
                 {% if request.user == profile_user %}
-                    <a href="{% url 'edit_profile' %}" class="btn btn-secondary mt-3">Edit Profile</a>
+                <a href="{% url 'edit_profile' %}" class="btn btn-secondary mt-3">Edit Profile</a>
                 {% endif %}
             </div>
         </div>

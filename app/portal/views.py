@@ -144,7 +144,7 @@ def edit_profile(request):
     Allow the current user to update their profile information.
     """
     if request.method == 'POST':
-        form = ProfileUpdateForm(request.POST, instance=request.user.profile)
+        form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()
             return redirect('profile', username=request.user.username)

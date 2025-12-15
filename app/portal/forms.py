@@ -17,6 +17,14 @@ class StudentAlumniRegistrationForm(UserCreationForm):
         model = User
         fields = UserCreationForm.Meta.fields + ('email', 'first_name', 'last_name', 'is_student', 'is_alumni')
 
+    def __init__(self, *args, **kwargs):
+        super(StudentAlumniRegistrationForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'form-check-input'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
@@ -34,7 +42,12 @@ class StudentAlumniRegistrationForm(UserCreationForm):
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ['bio', 'location', 'enrollment_year', 'graduation_year', 'industry', 'major', 'current_company', 'linkedin_url']
+        fields = ['profile_photo', 'bio', 'location', 'enrollment_year', 'graduation_year', 'industry', 'major', 'current_company', 'linkedin_url']
+
+    def __init__(self, *args, **kwargs):
+        super(ProfileUpdateForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
 
 # Post Creation Form
 class PostForm(forms.ModelForm):
@@ -42,7 +55,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['content']
         widgets = {
-            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Share an update, news, or achievement...'}),
+            'content': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Share an update, news, or achievement...', 'class': 'form-control'}),
         }
 
 # Comment Form (New)
@@ -60,14 +73,25 @@ class JobForm(forms.ModelForm):
         model = Job
         fields = ['title', 'company_name', 'location', 'job_type', 'description', 'requirements']
 
+    def __init__(self, *args, **kwargs):
+        super(JobForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs.update({'class': 'form-control'})
+
 # Event Creation Form
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ['title', 'description', 'location', 'date_time']
         widgets = {
-            'date_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'date_time': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if 'class' not in field.widget.attrs:
+                field.widget.attrs.update({'class': 'form-control'})
 
 class JobApplicationForm(forms.ModelForm):
     class Meta:
