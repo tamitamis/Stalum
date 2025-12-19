@@ -23,7 +23,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: alumni-portal
-        image: 10.43.210.159:8085/my-repository/stalum:latest
+        image: nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/my-repository/stalum:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
