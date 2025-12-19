@@ -139,19 +139,39 @@ spec:
                 container('kubectl') {
                     script {
                         dir('k8s') {
-                            sh """
                                 # Create namespace if not exists
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                                 
-                                # Force delete old deployment to prevent stuck rollouts (Zombie pods)
+                                # Force delete old deployment to clear stuck/zombie pods
                                 kubectl delete deployment alumni-portal -n ${NAMESPACE} --ignore-not-found=true
-
+                                
                                 # Apply deployment, service, ingress
                                 kubectl apply -f . -n ${NAMESPACE}
 
-                                # Wait for rollout
-                                kubectl rollout status deployment/alumni-portal -n ${NAMESPACE}
-                            """
+                                # ===== DEBUG: Show what got created =====
+                                echo "=== Deployment created ==="
+                                kubectl describe deployment alumni-portal -n ${NAMESPACE}
+                                
+                                echo "=== Initial pod status ==="
+                                kubectl get pods -n ${NAMESPACE} -o wide
+                                
+                                # ===== Wait for rollout with diagnostics =====
+                                if kubectl rollout status deployment/alumni-portal -n ${NAMESPACE} --timeout=10m; then
+                                    echo "Rollout successful!"
+                                else
+                                    echo "Rollout failed or timed out. Collecting debug info..."
+                                    echo "=== Final pod status ==="
+                                    kubectl get pods -n ${NAMESPACE} -o wide
+                                    
+                                    echo "=== Pod events ==="
+                                    kubectl describe pods -n ${NAMESPACE}
+                                    
+                                    echo "=== Deployment events ==="
+                                    kubectl describe deployment alumni-portal -n ${NAMESPACE}
+                                    
+                                    # Fail the pipeline
+                                    exit 1
+                                fi
                         }
                     }
                 }

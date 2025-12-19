@@ -6,6 +6,12 @@ metadata:
     app: alumni-portal
 spec:
   replicas: 1
+  progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: alumni-portal
@@ -14,6 +20,7 @@ spec:
       labels:
         app: alumni-portal
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
       - name: alumni-portal
         image: nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/my-repository/stalum:latest
