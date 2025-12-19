@@ -139,6 +139,7 @@ spec:
                 container('kubectl') {
                     script {
                         dir('k8s') {
+                            sh """
                                 # Create namespace if not exists
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                                 
@@ -172,6 +173,7 @@ spec:
                                     # Fail the pipeline
                                     exit 1
                                 fi
+                            """
                         }
                     }
                 }
