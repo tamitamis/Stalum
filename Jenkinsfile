@@ -143,6 +143,9 @@ spec:
                                 # Create namespace if not exists
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                                 
+                                # Force delete old deployment to prevent stuck rollouts (Zombie pods)
+                                kubectl delete deployment alumni-portal -n ${NAMESPACE} --ignore-not-found=true
+
                                 # Apply deployment, service, ingress
                                 kubectl apply -f . -n ${NAMESPACE}
 
