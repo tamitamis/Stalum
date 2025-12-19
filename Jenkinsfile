@@ -55,8 +55,9 @@ spec:
     environment {
         // Project Specific Configs
         // Project Specific Configs
-        IMAGE_REGISTRY = 'nexus.imcc.com'
-        IMAGE_PATH = 'my-repository/alumni-portal'
+        // Project Specific Configs
+        IMAGE_REGISTRY = 'nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085'
+        IMAGE_PATH = 'my-repository/stalum'
         NAMESPACE = '2401192'
     }
 
@@ -91,7 +92,7 @@ spec:
                         done
                     '''
                     // Using the registry IP/Port directly as requested
-                    sh "docker login http://${IMAGE_REGISTRY} -u student -p Imcc@2025"
+                    sh "docker login ${IMAGE_REGISTRY} -u student -p Imcc@2025"
                 }
             }
         }

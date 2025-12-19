@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: alumni-portal
-        image: nexus.imcc.com/my-repository/alumni-portal:latest
+        image: nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085/my-repository/stalum:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
