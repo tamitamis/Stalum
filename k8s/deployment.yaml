@@ -26,3 +26,15 @@ spec:
           value: "EUXMk1n9OYzOHBtdoroGfi9QdMiwnoJiG44A-DpEzliywCkf88LDl7LX5KE_9EMDP-qc"
         - name: DEBUG
           value: "False"
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
