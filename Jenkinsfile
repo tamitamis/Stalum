@@ -32,6 +32,8 @@ spec:
       subPath: kubeconfig
   - name: dind
     image: docker:dind
+    args:
+    - --insecure-registry=10.43.210.159:8085
     securityContext:
       privileged: true
     env:
