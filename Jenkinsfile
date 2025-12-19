@@ -100,7 +100,7 @@ spec:
         stage('Build Docker Image') {
             steps {
                 container('dind') {
-                    sh "docker build --build-arg REGISTRY=${IMAGE_REGISTRY} -t alumni-portal:latest ."
+                    sh "docker build -t alumni-portal:latest ."
                     sh "docker image ls"
                 }
             }
