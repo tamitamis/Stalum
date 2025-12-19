@@ -56,7 +56,7 @@ spec:
         // Project Specific Configs
         // Project Specific Configs
         // Project Specific Configs
-        IMAGE_REGISTRY = 'nexus-service-for-docker-hosted-registry.nexus.svc.cluster.local:8085'
+        IMAGE_REGISTRY = '10.43.210.159:8085'
         IMAGE_PATH = 'my-repository/stalum'
         NAMESPACE = '2401192'
     }
