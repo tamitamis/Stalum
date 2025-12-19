@@ -140,6 +140,11 @@ spec:
                     script {
                         dir('k8s') {
                             sh """
+                                # ===== DEBUG: Find Nexus IP =====
+                                echo "=== Looking for Nexus Service IP ==="
+                                kubectl get svc -n nexus || true
+                                kubectl get svc -A | grep nexus || true
+                                
                                 # Create namespace if not exists
                                 kubectl create namespace ${NAMESPACE} --dry-run=client -o yaml | kubectl apply -f -
                                 
